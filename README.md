@@ -17,6 +17,6 @@
 
 Чтобы запустить сайт, нужно клонировать репозиторий и написать команду npm start в консоли или перейти по ссылке, которая указана ниже:
 
-* [Ссылка на gh-pages](https://sosalnet.github.io/mesto-react/)
+* [Ссылка на gh-pages](https://sosalnet.github.io/mesto-react-auth/)
 
 
