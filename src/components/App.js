@@ -15,8 +15,8 @@ import Register from './Register.js';
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import * as auth from '../utils/auth.js';
 import InfoToolTip from './InfoToolTip.js';
-import Yes from '../images/yes.svg';
-import No from '../images/no.svg';
+import successInfotooltipImage from '../images/yes.svg';
+import failInfotooltipImage from '../images/no.svg';
 
 function App() {
 
@@ -67,7 +67,7 @@ function App() {
             .catch((err) => {
                 setResultMessage({
                     text: "Что-то пошло не так! Попробуйте ещё раз.",
-                    image: No,
+                    image: failInfotooltipImage,
                 });
                 setIsInfoMessagePopupOpen(true);
                 console.log(err);
@@ -79,7 +79,7 @@ function App() {
             .then((res) => {
                 setResultMessage({
                     text: "Вы успешно зарегистрировались!",
-                    image: Yes,
+                    image: successInfotooltipImage,
                 });
                 history.push("/sign-in");
                 console.log("Успех регистрации", res);
@@ -87,7 +87,7 @@ function App() {
             .catch((err) => {
                 setResultMessage({
                     text: "Что-то пошло не так!",
-                    image: No,
+                    image: failInfotooltipImage,
                 });
                 console.log("Ошибка регистрации", err);
             })

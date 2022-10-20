@@ -4,7 +4,7 @@ class Api {
         this._headers = apiConfig.headers;
     }
 
-    _check(res) {
+    _checkResponse(res) {
         if (res.ok) {
             return res.json();
         }
@@ -12,23 +12,23 @@ class Api {
     }
 
     getUserInfo() {
-        return fetch('https://nomoreparties.co/v1/cohort-48/users/me', {
+        return fetch(`${this._url}users/me`, {
                 method: 'GET',
                 headers: this._headers
             })
-            .then(this._check)
+            .then(this._checkResponse)
     }
 
     getCards() {
-        return fetch('https://mesto.nomoreparties.co/v1/cohort-48/cards', {
+        return fetch(`${this._url}/cards`, {
                 method: 'GET',
                 headers: this._headers
             })
-            .then(this._check)
+            .then(this._checkResponse)
     }
 
     setUserInfo(username, description) {
-        return fetch('https://mesto.nomoreparties.co/v1/cohort-48/users/me', {
+        return fetch(`${this._url}/users/me`, {
                 method: 'PATCH',
                 headers: this._headers,
                 body: JSON.stringify({
@@ -36,11 +36,11 @@ class Api {
                     about: description
                 })
             })
-            .then(this._check)
+            .then(this._checkResponse)
     }
 
     addNewCard(name, link) {
-        return fetch('https://mesto.nomoreparties.co/v1/cohort-48/cards', {
+        return fetch(`${this._url}/cards`, {
                 method: 'POST',
                 headers: this._headers,
                 body: JSON.stringify({
@@ -48,34 +48,34 @@ class Api {
                     link: link
                 })
             })
-            .then(this._check)
+            .then(this._checkResponse)
     }
 
     changeLikeCardStatus(id, isLiked) {
-        return fetch(`https://mesto.nomoreparties.co/v1/cohort-48/cards/likes/${id}`, {
+        return fetch(`${this._url}/cards/likes/${id}`, {
                 method: isLiked ? 'PUT' : 'DELETE',
                 headers: this._headers
             })
-            .then(this._check);
+            .then(this._checkResponse);
     }
 
     deleteCard(id) {
-        return fetch(`https://mesto.nomoreparties.co/v1/cohort-48/cards/${id}`, {
+        return fetch(`${this._url}/cards/${id}`, {
                 method: 'DELETE',
                 headers: this._headers
             })
-            .then(this._check);
+            .then(this._checkResponse);
     }
 
     addNewAvatar(avatar) {
-        return fetch('https://mesto.nomoreparties.co/v1/cohort-48/users/me/avatar', {
+        return fetch(`${this._url}/users/me/avatar`, {
                 method: 'PATCH',
                 headers: this._headers,
                 body: JSON.stringify({
                     avatar: avatar.avatar
                 })
             })
-            .then(this._check);
+            .then(this._checkResponse);
     }
 }
 
