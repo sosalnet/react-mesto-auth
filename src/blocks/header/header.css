@@ -1,15 +1,9 @@
 .header {
   margin: auto;
   display: flex;
-  max-width: 880px;
-  padding: 45px 0 0;
-  border-bottom: 1px solid rgba(84 84 84 / 70%);
   justify-content: space-between;
   align-items: center;
-}
-
-@media screen and (max-width: 882px) {
-  .header {
-    padding: 28px 0 0;
-  }
+  max-width: 880px;
+  padding: 45px 0 0;
+  border-bottom: 1px solid #545454;
 }
