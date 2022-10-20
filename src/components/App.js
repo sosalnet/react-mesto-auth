@@ -11,8 +11,12 @@ import EditAvatarPopup from './EditAvatarPopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import ProtectedRoute from './ProtectedRoute.js';
 import Login from './Login.js';
-import Register from './Register.js'
-import { Route, Switch, Redirect } from "react-router-dom";
+import Register from './Register.js';
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
+import * as auth from '../utils/auth.js';
+import InfoToolTip from './InfoToolTip.js';
+import Yes from '../images/yes.svg';
+import No from '../images/no.svg';
 
 function App() {
 
@@ -22,10 +26,80 @@ function App() {
     const [selectedCard, setSelectedCard] = useState({});
     const [currentUser, setCurrentUser] = useState({});
     const [cards, setCards] = useState([]);
-    const [loggedIn, setLoggenIn] = useState(false);
-    const handleLogin = () => {
-        setLoggenIn(true);
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [isInfoMessagePopupOpen, setIsInfoMessagePopupOpen] = useState(false);
+    const [resultMessage, setResultMessage] = useState({ text: '', image: '' });
+    const [email, setEmail] = useState('');
+    let history = useHistory();
+    const tokenCheck = () => {
+        const jwt = localStorage.getItem('jwt');
+        if (jwt) {
+            auth.getContent(jwt).then((res) => {
+                if (res) {
+                    setEmail(res.data.email);
+                    setLoggedIn(true);
+                    history.push('/');
+                }
+            })
+                .catch((err) => {
+                    setLoggedIn(false);
+                    console.log(`Переданный токен некорректен: ${err}`);
+                });
+        }
     }
+    const handleInfoMessage = () => { 
+        setIsInfoMessagePopupOpen(true) 
+    }
+    const handleLogin = (userEmail, userPassword, resetLoginForm) => {
+        if (!userEmail || !userPassword) {
+            return;
+        }
+        auth
+            .authorize(userEmail, userPassword)
+            .then((data) => {
+                if (data.token) {
+                    localStorage.setItem("jwt", data.token);
+                    setLoggedIn(true);
+                    history.push("/home");
+                    resetLoginForm();
+                }
+            })
+            .catch((err) => {
+                setResultMessage({
+                    text: "Что-то пошло не так! Попробуйте ещё раз.",
+                    image: No,
+                });
+                setIsInfoMessagePopupOpen(true);
+                console.log(err);
+            });
+    };
+    const handleRegister = (userEmail, userPassword) => {
+        auth
+            .register(userPassword, userEmail)
+            .then((res) => {
+                setResultMessage({
+                    text: "Вы успешно зарегистрировались!",
+                    image: Yes,
+                });
+                history.push("/sign-in");
+                console.log("Успех регистрации", res);
+            })
+            .catch((err) => {
+                setResultMessage({
+                    text: "Что-то пошло не так!",
+                    image: No,
+                });
+                console.log("Ошибка регистрации", err);
+            })
+            .finally(() => {
+                setIsInfoMessagePopupOpen(true);
+            });
+    };
+    const handleLogout = () => {
+        localStorage.removeItem("jwt");
+        history.push("/sign-in");
+        setLoggedIn(false);
+    };
 
     function handleEditProfileClick() {
         setIsEditProfilePopupOpen(true);
@@ -48,6 +122,7 @@ function App() {
         setIsAddPlacePopupOpen(false);
         setIsEditAvatarPopupOpen(false);
         setSelectedCard({})
+        setIsInfoMessagePopupOpen(false);
     }
 
     function handleUpdateAvatar(e) {
@@ -125,10 +200,14 @@ function App() {
             })
     }, []);
 
+    useEffect(() => {
+        tokenCheck();
+    }, [loggedIn]);
+
     return (
         <CurrentUserContext.Provider value={currentUser}>
-        <div className="app">
-                <Header />
+            <div className="app">
+                <Header email={email} handleLogout={handleLogout} />
                 <Switch>
                     <ProtectedRoute
                         exact path='/'
@@ -146,7 +225,11 @@ function App() {
                         <Login handleLogin={handleLogin} />
                     </Route>
                     <Route path='/sign-up'>
-                        <Register />
+                        <Register
+                            handleRegister={handleRegister}
+                            onSucess={handleInfoMessage}
+                            updateMessage={setResultMessage}
+                        />
                     </Route>
                     <Route>
                         {loggedIn ? <Redirect to='/' /> : <Redirect to='/sign-in' />}
@@ -163,9 +246,11 @@ function App() {
 
                 <ImagePopup card={selectedCard} onClose={closeAllPopup} />
 
+                <InfoToolTip isOpen={isInfoMessagePopupOpen} onClose={closeAllPopup} resultMessage={resultMessage} />
+
                 <PopupWithForm name='delete' title='Вы уверены?' textButton='Да' />
 
-        </div>
+            </div>
         </CurrentUserContext.Provider>
     );
 }
