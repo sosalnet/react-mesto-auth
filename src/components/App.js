@@ -30,25 +30,26 @@ function App() {
     const [isInfoMessagePopupOpen, setIsInfoMessagePopupOpen] = useState(false);
     const [resultMessage, setResultMessage] = useState({ text: '', image: '' });
     const [email, setEmail] = useState('');
-    let history = useHistory();
-    const tokenCheck = () => {
+    const history = useHistory();
+    const checkToken = () => {
         const jwt = localStorage.getItem('jwt');
         if (jwt) {
-            auth.getContent(jwt).then((res) => {
-                if (res) {
-                    setEmail(res.data.email);
-                    setLoggedIn(true);
-                    history.push('/');
-                }
-            })
+            auth.getContent(jwt)
+                .then((res) => {
+                    if (res) {
+                        setEmail(res.data.email);
+                        setLoggedIn(true);
+                        history.push('/');
+                    }
+                })
                 .catch((err) => {
                     setLoggedIn(false);
                     console.log(`Переданный токен некорректен: ${err}`);
                 });
         }
     }
-    const handleInfoMessage = () => { 
-        setIsInfoMessagePopupOpen(true) 
+    const handleInfoMessage = () => {
+        setIsInfoMessagePopupOpen(true)
     }
     const handleLogin = (userEmail, userPassword, resetLoginForm) => {
         if (!userEmail || !userPassword) {
@@ -181,28 +182,19 @@ function App() {
     }
 
     useEffect(() => {
-        api.getCards()
-            .then((res) => {
-                setCards(res);
+        Promise.all([api.getUserInfo(), api.getCards()])
+            .then(([userData, cardsInfo]) => {
+                setCurrentUser(userData);
+                setCards(cardsInfo);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log(err);
-            })
-    }, []);
-
-    useEffect(() => {
-        api.getUserInfo()
-            .then((e) => {
-                setCurrentUser(e);
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }, []);
-
-    useEffect(() => {
-        tokenCheck();
+            });
     }, [loggedIn]);
+
+    useEffect(() => {
+        checkToken();
+    }, []);
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
