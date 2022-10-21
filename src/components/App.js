@@ -182,15 +182,15 @@ function App() {
     }
 
     useEffect(() => {
-        if(loggedIn){
-        Promise.all([api.getUserInfo(), api.getCards()])
-            .then(([userData, cardsInfo]) => {
-                setCurrentUser(userData);
-                setCards(cardsInfo);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        if (loggedIn) {
+            Promise.all([api.getUserInfo(), api.getCards()])
+                .then(([userData, cardsInfo]) => {
+                    setCurrentUser(userData);
+                    setCards(cardsInfo);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         }
     }, [loggedIn]);
 
