@@ -182,6 +182,7 @@ function App() {
     }
 
     useEffect(() => {
+        if(loggedIn){
         Promise.all([api.getUserInfo(), api.getCards()])
             .then(([userData, cardsInfo]) => {
                 setCurrentUser(userData);
@@ -190,6 +191,7 @@ function App() {
             .catch((err) => {
                 console.log(err);
             });
+        }
     }, [loggedIn]);
 
     useEffect(() => {
